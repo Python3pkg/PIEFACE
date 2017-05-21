@@ -1,6 +1,6 @@
 """ Read in atomic coordinates and cell parameters """
 
-from __future__ import division
+
 import numpy as np
 import os
 #import warnings
@@ -161,7 +161,7 @@ class Crystal(object):
         
     def makepolyhedron(self, centre, ligands, atomdict=None, ligtypes=None):
         """ Make polyhedron from centre and ligands. """
-        import polyhedron
+        from . import polyhedron
         # Polyhedron init is very flexible: this means it can be called with both atom labels
         # and a dict of positions (ie. self.atoms) or with individual dicts for centre and ligands.
         # This means that the polyhedron can be defined with ligand positions in a different 
@@ -170,14 +170,14 @@ class Crystal(object):
             assert len(ligands) > 0
         except AssertionError:
             if isinstance(centre, dict):
-                logger.warning("No ligands have been defined for %s", centre.keys()[0])
+                logger.warning("No ligands have been defined for %s", list(centre.keys())[0])
             elif isinstance(centre, tuple) or isinstance(centre, list):
                 logger.warning("No ligands have been defined for %s", centre[0])
             else:
                 logger.warning("No ligands have been defined for %s", centre)
         
         if isinstance(centre, dict):
-            cenname = centre.keys()[0]
+            cenname = list(centre.keys())[0]
         elif isinstance(centre, tuple) or isinstance(centre, list):
             cenname = centre[0]
         elif isinstance(centre,str):
@@ -188,12 +188,12 @@ class Crystal(object):
 def readcif(FILE):
     """ Read useful data from cif using PyCifRW. """
     import CifFile     # Should be PyCifRW module, but also occurs in GSASII - I haven't yet found a conflict...
-    import urllib
+    import urllib.request, urllib.parse, urllib.error
     
     symmops=None
     try:
         if os.path.isfile(FILE):
-            allcif = CifFile.ReadCif(urllib.pathname2url(FILE))
+            allcif = CifFile.ReadCif(urllib.request.pathname2url(FILE))
         else:
             allcif = CifFile.ReadCif(FILE)
     except:
@@ -202,13 +202,13 @@ def readcif(FILE):
         else:
             raise IOError("Problem reading file {0} - does it exist?".format(FILE))
     
-    if len(allcif.keys()) != 1:    # Cif file contains more than one entry
-        print "Cif file contains more than one phase:"
-        for i in allcif.keys():
-            print "\t{0}".format(i)
-        phase = raw_input("Please enter required phase:\t")
+    if len(list(allcif.keys())) != 1:    # Cif file contains more than one entry
+        print("Cif file contains more than one phase:")
+        for i in list(allcif.keys()):
+            print("\t{0}".format(i))
+        phase = input("Please enter required phase:\t")
     else:
-        phase = allcif.keys()[0]
+        phase = list(allcif.keys())[0]
     
     # Read cell
     cell = {}
@@ -244,7 +244,7 @@ def readcif(FILE):
     symmid_strings = ['_symmetry_equiv_pos_site_id']        # Valid keys for symmetry operation numbers from PyCifRW
     keyintsec = set(symmid_strings) & set(allcif[phase].keys())
     if len( keyintsec ) < 1:
-        symmid = range(len(symmops))    # Number by default if needed
+        symmid = list(range(len(symmops)))    # Number by default if needed
     else:
         symmid = allcif[phase][keyintsec.pop()]
         
@@ -266,8 +266,9 @@ def makeP1cell(atomcoords, symmops, symmid):
     label is not changed).
     """
     
-    def _shiftcoord((x,y,z)):
+    def _shiftcoord(xxx_todo_changeme):
         """ Shift atom coordinates back into unit cell (0.0 <= r < 1.0)"""
+        (x,y,z) = xxx_todo_changeme
         if x >= 1.0: x -= 1.0
         if x < 0.0: x += 1.0
         if y >= 1.0: y -= 1.0
@@ -318,7 +319,7 @@ def findligands(centre, atomcoords, orthom, radius=2.0, types=[], names = [], at
     for site in cell1:
     #    cell2[site] = cell1[site] + 99.5
         # Check central atom exists
-        if centre not in atomcoords.keys():
+        if centre not in list(atomcoords.keys()):
             raise KeyError("Atom {0} not found in atomcoords".format(centre))
     
     if types == []:
@@ -327,7 +328,7 @@ def findligands(centre, atomcoords, orthom, radius=2.0, types=[], names = [], at
         if atomtypes is None:
             raise ValueError("List of valid types requires corresponding atomtypes dictionary")
         for t in types:
-            if t not in atomtypes.values():
+            if t not in list(atomtypes.values()):
                 raise ValueError("Atom type {0} is not allowed. Valid types are: {1}".format(t, ", ".join([str(p) for p in set(atomtypes.values())])))
         checktype = True
     
@@ -337,7 +338,7 @@ def findligands(centre, atomcoords, orthom, radius=2.0, types=[], names = [], at
         if atomtypes is None:
             raise ValueError("List of ligand names requires corresponding atomtypes dictionary")
         for t in names:
-            if t not in atomtypes.keys():
+            if t not in list(atomtypes.keys()):
                 raise ValueError("Atom label {0} is not allowed. Valid labels are: {1}".format(t, ", ".join([str(p) for p in set(atomtypes.keys())])))
         checkname = True
         
@@ -352,14 +353,14 @@ def findligands(centre, atomcoords, orthom, radius=2.0, types=[], names = [], at
             continue
         else:
             if checktype:   # Method to filter out correct atom types, either with exact name in dict, or original name in dict (without _##)
-                if site in atomtypes.keys() and atomtypes[site] not in types:
+                if site in list(atomtypes.keys()) and atomtypes[site] not in types:
                     continue
-                elif '_'.join(site.split('_')[:-1]) in atomtypes.keys() and atomtypes[ '_'.join(site.split('_')[:-1]) ] not in types:
+                elif '_'.join(site.split('_')[:-1]) in list(atomtypes.keys()) and atomtypes[ '_'.join(site.split('_')[:-1]) ] not in types:
                     continue
             elif checkname: # Filter out ligands by label
-                if site in atomtypes.keys() and ( site not in names and '_'.join(site.split('_')[:-1]) not in names):
+                if site in list(atomtypes.keys()) and ( site not in names and '_'.join(site.split('_')[:-1]) not in names):
                     continue
-                elif '_'.join(site.split('_')[:-1]) in atomtypes.keys() and '_'.join(site.split('_')[:-1]) not in names:
+                elif '_'.join(site.split('_')[:-1]) in list(atomtypes.keys()) and '_'.join(site.split('_')[:-1]) not in names:
                     continue
             
             # Array to check all 26 neighbouring cell translations (+ original cell)
@@ -384,16 +385,16 @@ def findligands(centre, atomcoords, orthom, radius=2.0, types=[], names = [], at
                 if labelapp == 96:
                     ligands[site] = t
                     # Add ligand type
-                    if site in atomtypes.keys():
+                    if site in list(atomtypes.keys()):
                         ligtypes[site] = atomtypes[site]
-                    elif '_'.join(site.split('_')[:-1]) in atomtypes.keys():
+                    elif '_'.join(site.split('_')[:-1]) in list(atomtypes.keys()):
                         ligtypes[site] = atomtypes[ '_'.join(site.split('_')[:-1]) ]                    
                 else:
                     ligands[site+chr(labelapp)] = t
                     # Add ligand type
-                    if site in atomtypes.keys():
+                    if site in list(atomtypes.keys()):
                         ligtypes[site+chr(labelapp)] = atomtypes[site]
-                    elif '_'.join(site.split('_')[:-1]) in atomtypes.keys():
+                    elif '_'.join(site.split('_')[:-1]) in list(atomtypes.keys()):
                         ligtypes[site+chr(labelapp)] = atomtypes[ '_'.join(site.split('_')[:-1]) ]
                 labelapp += 1                    
             

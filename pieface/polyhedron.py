@@ -1,6 +1,6 @@
 """ Module for containing polyhedron data and functions """
 
-from __future__ import division
+
 import numpy as np
 
 class Polyhedron(object):
@@ -31,10 +31,10 @@ class Polyhedron(object):
             # Receive atoms as name/coordinate pairs
             if isinstance(centre, dict):    # Centre atom first
                 # Receive centre as dict
-                if len(centre.keys()) != 1:
+                if len(list(centre.keys())) != 1:
                     raise ValueError("Only one central atom must be defined")
-                self.cenlbl = centre.keys()[0]
-                self.cenabc = np.array(centre[centre.keys()[0]]).astype(np.float)
+                self.cenlbl = list(centre.keys())[0]
+                self.cenabc = np.array(centre[list(centre.keys())[0]]).astype(np.float)
             elif isinstance(centre, tuple) or isinstance(centre, list):
                 if len(centre) != 2:
                     raise ValueError("Only one central atom must be defined")
@@ -45,9 +45,9 @@ class Polyhedron(object):
                 raise TypeError("Unknown central atom definition")
                 
             if isinstance(ligands, dict):   # Read in ligands
-                self.liglbl = [i for i in ligands.keys()]
+                self.liglbl = [i for i in list(ligands.keys())]
                 self.liglbl.sort()
-                if len(ligands.keys()) == 0:
+                if len(list(ligands.keys())) == 0:
                     self.ligabc = np.array([[]]).T.astype(np.float) # Transpose so shape is (0,1) rather than (1,0)
                 else:
                     self.ligabc = np.array([ ligands[i] for i in self.liglbl ]).astype(np.float)
@@ -163,14 +163,14 @@ class Polyhedron(object):
     
     def makeellipsoid(self, orthom, **kwargs):
         """ Set up ellipsoid object and fit minimum bounding ellipsoid """
-        import ellipsoid
+        from . import ellipsoid
         
-        if 'tolerance' in kwargs.keys():
+        if 'tolerance' in list(kwargs.keys()):
             setattr(self, "ellipsoid", ellipsoid.Ellipsoid(points = self.alldelxyz(orthom), tolerance=kwargs.pop('tolerance')))
         else:
             setattr(self, "ellipsoid", ellipsoid.Ellipsoid(points = self.alldelxyz(orthom)))
         
-        if 'maxcycles' in kwargs.keys():
+        if 'maxcycles' in list(kwargs.keys()):
             self.ellipsoid.findellipsoid(maxcycles=kwargs['maxcycles'])
         else:
             self.ellipsoid.findellipsoid()
@@ -187,7 +187,7 @@ class Polyhedron(object):
             if self.centyp is not None:
                 usedcols[self.centyp] = colours[0]
             for i, site in enumerate(self.liglbl):
-                if self.ligtyp[i] in usedcols.keys():
+                if self.ligtyp[i] in list(usedcols.keys()):
                     colours.append(usedcols[self.ligtyp[i]])
                 elif self.centyp is not None and self.ligtyp[i] == self.centyp:
                     colours.append(usedcols[self.centyp])

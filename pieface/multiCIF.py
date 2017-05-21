@@ -97,7 +97,7 @@ def listener_process(queue, configurer):
             raise
         except:
             import sys, traceback
-            print >> sys.stderr, 'Whoops! Problem:'
+            print('Whoops! Problem:', file=sys.stderr)
             traceback.print_exc(file=sys.stderr)
     
 def _wrapper(args):
@@ -112,7 +112,7 @@ def _wrapper(args):
         
 def _alllabels(CIF):
     """ Return all allowed labels in CIF file. """
-    return _alltyplbls(CIF).keys()
+    return list(_alltyplbls(CIF).keys())
 
 def _alltyplbls(CIF):
     """ Return all allowed labels and corresponding types in CIF file. """
@@ -123,7 +123,7 @@ def _alltyplbls(CIF):
     
 def _alltypes(CIF):
     """ Return all allowed types in CIF file. """
-    return _alltyplbls(CIF).values()
+    return list(_alltyplbls(CIF).values())
     
 def check_labels(labels, alllabs):
     """ Check that all labels are present in all cif files, handling regular expressions if needed.
@@ -214,7 +214,7 @@ def check_ligands(cifs, ligtypes, liglbls):
     for c in cifs:
         typlbls = _alltyplbls(c)      # Get labels and types from current cif
         for l in typlbls:
-            if l in ligtyplbls.keys():      # Label already exists in overall dict - if the type is the same, we can ignore it
+            if l in list(ligtyplbls.keys()):      # Label already exists in overall dict - if the type is the same, we can ignore it
                 if typlbls[l] in ligtyplbls[l]:
                     continue
                 else:                       # Types are different: append type to label list
@@ -313,7 +313,7 @@ def run_parallel(cifs, testcen, radius=3.0, ligtypes=[], lignames=[], maxcycles=
         pool.terminate()
         log.critical('Terminated successfully')
         raise
-    except Exception, e:
+    except Exception as e:
         err = True
         log.critical('got exception: %r, terminating all processes' % (e,))
         pool.terminate()
@@ -378,7 +378,7 @@ def run_serial(cifs, testcen, radius=3.0, ligtypes=[], lignames=[], maxcycles=No
     
 def plot_all(phases):
     plots = {}
-    for CIF in phases.keys():
+    for CIF in list(phases.keys()):
         plots[CIF] = {}    
         for cen in getattr(phases[CIF], 'polyhedra'):
             colours = getattr(phases[CIF], cen+"_poly").pointcolours()

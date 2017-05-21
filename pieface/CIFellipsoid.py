@@ -11,7 +11,7 @@ def _alllabels(CIF):
     """ Return all allowed labels in CIF file. """
     from pieface.readcoords import readcif
     cell, atomcoords, atomtypes, spacegp, symmops, symmid = readcif(CIF)
-    return atomcoords.keys()
+    return list(atomcoords.keys())
 
 def _query(question, default="yes", output=None):
     """Ask a yes/no question via raw_input() and return their answer. """
@@ -28,7 +28,7 @@ def _query(question, default="yes", output=None):
 
     while True:
         output.critical(question + prompt)
-        choice = raw_input().lower()
+        choice = input().lower()
         if default is not None and choice == '':
             return valid[default]
         elif choice in valid:
@@ -158,14 +158,14 @@ def main():
             
     try:
         if args.printlabels:
-            print "\nValid atom labels are:\n"
+            print("\nValid atom labels are:\n")
             for CIF in cifs:
-                print "{0:<40}:  {1}".format(CIF, ", ".join(_alllabels(CIF)))
+                print("{0:<40}:  {1}".format(CIF, ", ".join(_alllabels(CIF))))
             raise
         elif args.centres is None:
             # Behave like argparse error
             parser.print_usage()
-            print "CIFellipsoid.py: error: argument -m/--metal is required"
+            print("CIFellipsoid.py: error: argument -m/--metal is required")
             raise
 
         if args.nosave:

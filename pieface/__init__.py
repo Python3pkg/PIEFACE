@@ -15,7 +15,7 @@ __all__ = ["ellipsoid", "plotellipsoid", "readcoords", "polyhedron", "calcellips
 import logging
 logging.getLogger('pieface').addHandler(logging.NullHandler())
 
-import calcellipsoid
-import readcoords
-import writeproperties
-import multiCIF
+from . import calcellipsoid
+from . import readcoords
+from . import writeproperties
+from . import multiCIF

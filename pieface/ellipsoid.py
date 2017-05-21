@@ -11,7 +11,7 @@ Basic usage:
     * After that, all other properties should be available.
 """
 
-from __future__ import division
+
 import numpy as np
 
 
@@ -102,7 +102,7 @@ class Ellipsoid(object):
         relpoints = points - np.tile(points[0], (points.shape[0], 1))   # Coordinates of points relative to first point - needed for checking linearity and planarity
         
         if kwargs is not None:
-            if 'maxcycles' in kwargs.keys():
+            if 'maxcycles' in list(kwargs.keys()):
                 maxcycles = kwargs['maxcycles']
             else:
                 maxcycles = None
@@ -251,7 +251,7 @@ class Ellipsoid(object):
         
     def plot(self, figure=None, axes=None, **kwargs):
         """ Plot graph of ellipsoid """
-        import plotellipsoid
+        from . import plotellipsoid
         ellipfig = plotellipsoid.EllipsoidImage(figure, axes)
         ellipfig.plotell(self, **kwargs)
         return ellipfig
@@ -285,9 +285,9 @@ class Ellipsoid(object):
         
     def plotsummary(self, **kwargs):
         """ Plot graph of ellipsoid with text of basic parameters """
-        import plotellipsoid
+        from . import plotellipsoid
         
-        if 'axcols' in kwargs.keys():       # Colours for ellipsoid axes
+        if 'axcols' in list(kwargs.keys()):       # Colours for ellipsoid axes
             if kwargs['axcols'] is None:
                 axcols = ['b']*3
             else:

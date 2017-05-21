@@ -40,18 +40,18 @@ extensions = [
 ##############################################################################
 
 # General information about the project.
-project = u'PIEFACE'
-copyright = u'2016, James Cumby'
-author = u'James Cumby'
+project = 'PIEFACE'
+copyright = '2016, James Cumby'
+author = 'James Cumby'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = u'1.0'
+version = '1.0'
 # The full version, including alpha/beta/rc tags.
-release = u'1.0.0'
+release = '1.0.0'
 
 # Add any text (e.g. global subtitutions) to be added to the end of any .rst files here
 rst_epilog="""
@@ -289,8 +289,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'pieface.tex', u'pieface Documentation',
-     u'James Cumby', 'manual'),
+    (master_doc, 'pieface.tex', 'pieface Documentation',
+     'James Cumby', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -331,7 +331,7 @@ latex_logo = 'images/high_res_icon.png'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pieface', u'pieface Documentation',
+    (master_doc, 'pieface', 'pieface Documentation',
      [author], 1)
 ]
 
@@ -346,7 +346,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pieface', u'pieface Documentation',
+    (master_doc, 'pieface', 'pieface Documentation',
      author, 'pieface', 'One line description of project.',
      'Miscellaneous'),
 ]

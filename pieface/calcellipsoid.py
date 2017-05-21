@@ -26,7 +26,7 @@ def calcfromcif(CIF, centres, radius, allligtypes=[], alllignames=[], **kwargs):
     phase = readcoords.Crystal(cell=cell, atoms=allatoms, atomtypes=atomtypes)
     
     for cen in centres:
-        if cen not in allatoms.keys():
+        if cen not in list(allatoms.keys()):
             logger.info("Centre %s is not present in atom labels: skipping", cen)
             continue
             
@@ -60,9 +60,9 @@ def makenesteddict(phases):
     
     data = {}
     
-    for site in set( [ j for file in phases.keys() for j in phases[file].polyhedra ] ):      # Iterate through all possible atom types in phases dict
+    for site in set( [ j for file in list(phases.keys()) for j in phases[file].polyhedra ] ):      # Iterate through all possible atom types in phases dict
         data[site] = {}
-        data[site]['files'] = [ f for f in phases.keys() if site in phases[f].polyhedra ]     # Get list of files for which site is present
+        data[site]['files'] = [ f for f in list(phases.keys()) if site in phases[f].polyhedra ]     # Get list of files for which site is present
         
         #data[site]['radii'] = [ getattr(phases[f], site+"_poly").ellipsoid.radii for f in data[site]['files'] ]
         data[site]['r1'] = [ getattr(phases[f], site+"_poly").ellipsoid.radii[0] for f in data[site]['files'] ]
@@ -102,12 +102,12 @@ def makeDataFrame(phases):
     from pieface.readcoords import Crystal
     
     if isinstance(phases, dict):
-        if isinstance( phases[phases.keys()[0]], Crystal):      # We are reading a dict of Crystals: convert to nested dict first
+        if isinstance( phases[list(phases.keys())[0]], Crystal):      # We are reading a dict of Crystals: convert to nested dict first
             alldata = makenesteddict(phases)
-        elif isinstance( phases[phases.keys()[0]], dict ):      # Looking at a dict of dicts: assume correct for pandas...
+        elif isinstance( phases[list(phases.keys())[0]], dict ):      # Looking at a dict of dicts: assume correct for pandas...
             alldata = phases
             
-        d = dict([ (i, pd.DataFrame(alldata[i]).set_index('files')) for i in alldata.keys() ])        # Make dict of DataFrames
+        d = dict([ (i, pd.DataFrame(alldata[i]).set_index('files')) for i in list(alldata.keys()) ])        # Make dict of DataFrames
         
         frame = pd.concat(d, axis=1)
         

@@ -2,10 +2,10 @@
 
 """ Graphical interface to multiCIF, offering a GUI equivalent of CIFellipsoid.py. """
 
-import Tkinter as tk
-import tkMessageBox
-import tkFileDialog
-import ttk
+import tkinter as tk
+import tkinter.messagebox
+import tkinter.filedialog
+import tkinter.ttk
 
 import os, sys
 from pieface import multiCIF
@@ -14,7 +14,7 @@ import traceback
 import threading
 import logging
 import multiprocessing
-import Queue
+import queue
 
 import matplotlib
 matplotlib.use('TkAgg')
@@ -47,9 +47,9 @@ class MainWindow:
         
         self.filenames = []
         
-        self.nbookmain = ttk.Notebook(self.parent)
-        self.intab = ttk.Frame(self.nbookmain)
-        self.logtab = ttk.Frame(self.nbookmain)
+        self.nbookmain = tkinter.ttk.Notebook(self.parent)
+        self.intab = tkinter.ttk.Frame(self.nbookmain)
+        self.logtab = tkinter.ttk.Frame(self.nbookmain)
         self.nbookmain.add(self.intab, text='Input', sticky='nesw')
         self.nbookmain.add(self.logtab, text='Output log', sticky='nesw', state=tk.NORMAL)
         
@@ -71,13 +71,13 @@ class MainWindow:
     def report_callback_exception(self, *args):
         """ Modify exception behaviour to print to message box if not caught """
         a = traceback.format_exception(*args)
-        tkMessageBox.showerror(a[-1], "\n".join(a[:-1]))
+        tkinter.messagebox.showerror(a[-1], "\n".join(a[:-1]))
 
         
     def init_gui(self, parent):
         """ Initialise the GUI layout"""
         # Make frame to hold everything in window
-        self.frame = ttk.Frame(parent)
+        self.frame = tkinter.ttk.Frame(parent)
         # Set grid expansion options in main frame
         self.frame.grid(sticky=(tk.N, tk.S, tk.E, tk.W))        # Main frame expands with window
         self.frame.columnconfigure(0, weight=1)
@@ -88,14 +88,14 @@ class MainWindow:
         self.parent = parent
 
         # File open button
-        self.filebutton = ttk.Button(self.frame, text="Add File(s)", command = self.openfiles)
+        self.filebutton = tkinter.ttk.Button(self.frame, text="Add File(s)", command = self.openfiles)
         self.filebutton.grid(row=0, column = 3, sticky=(tk.NE, tk.NW), padx=3)
         # Remove file button
-        self.clearbutton = ttk.Button(self.frame, text="Remove File(s)", command = self.removefile, state='disabled')
+        self.clearbutton = tkinter.ttk.Button(self.frame, text="Remove File(s)", command = self.removefile, state='disabled')
         self.clearbutton.grid(row=1, column = 3, sticky=(tk.NE, tk.NW), padx=3)
     
         # Frame to hold file box and scrollbars
-        self.fileframe = ttk.Frame(self.frame)
+        self.fileframe = tkinter.ttk.Frame(self.frame)
         self.fileframe.grid(row=0, column=0, columnspan = 2, rowspan = 4, sticky = (tk.N, tk.E, tk.S, tk.W))
         self.fileframe.columnconfigure(0, weight=1)
         #self.fileframe.columnconfigure(1, weight=1)
@@ -104,8 +104,8 @@ class MainWindow:
         # List box (from Tkinter, not ttk) to hold list of file names
         self.filebox = tk.Listbox(self.fileframe, width=30, selectmode =tk.EXTENDED)
         # Scrollbars
-        self.filevscroll = ttk.Scrollbar(self.fileframe, orient=tk.VERTICAL)
-        self.filehscroll = ttk.Scrollbar(self.fileframe, orient=tk.HORIZONTAL)
+        self.filevscroll = tkinter.ttk.Scrollbar(self.fileframe, orient=tk.VERTICAL)
+        self.filehscroll = tkinter.ttk.Scrollbar(self.fileframe, orient=tk.HORIZONTAL)
         # Set up scrollbars and box to communicate
         self.filebox.config(yscrollcommand = self.filevscroll.set)
         self.filebox.config(xscrollcommand = self.filehscroll.set)
@@ -129,9 +129,9 @@ class MainWindow:
         rownow = 4
         
         for option in textord:
-            setattr(self, option+'lbl', ttk.Label(self.frame, text = textargs[option][0]))
+            setattr(self, option+'lbl', tkinter.ttk.Label(self.frame, text = textargs[option][0]))
             getattr(self, option+'lbl').grid(column = 0, row= rownow, sticky = tk.W)
-            setattr(self, option+'ent', ttk.Entry(self.frame))
+            setattr(self, option+'ent', tkinter.ttk.Entry(self.frame))
             getattr(self, option+'ent').grid(column = 1, row= rownow, sticky = (tk.W, tk.E))
             if textargs[option][1] != '':
                 getattr(self, option+'ent').insert(0, textargs[option][1])
@@ -149,35 +149,35 @@ class MainWindow:
                 getattr(self, option+'var').set(1)
             else:
                 getattr(self, option+'var').set(0)
-            setattr(self, option+'chk', ttk.Checkbutton(self.frame, text = tickargs[option][0], variable = getattr(self, option+'var'), command = lambda c=option: self.disable_check(c)  ))
+            setattr(self, option+'chk', tkinter.ttk.Checkbutton(self.frame, text = tickargs[option][0], variable = getattr(self, option+'var'), command = lambda c=option: self.disable_check(c)  ))
             getattr(self, option+'chk').grid(column = 0, row= rownow, sticky = tk.W)
             rownow += 1
 
         # Add custom options button
         self.extravar = tk.IntVar()
         self.extravar.set(0)
-        self.extrachk = ttk.Checkbutton(self.frame, text='Additional options (for advanced use)', variable=self.extravar, command = lambda c='extra': self.disable_check(c))
+        self.extrachk = tkinter.ttk.Checkbutton(self.frame, text='Additional options (for advanced use)', variable=self.extravar, command = lambda c='extra': self.disable_check(c))
         self.extrachk.grid(column = 0, row=30, sticky=tk.W)
-        self.extraent = ttk.Entry(self.frame, state='disabled')
+        self.extraent = tkinter.ttk.Entry(self.frame, state='disabled')
         self.extraent.grid(column = 1, row=30, sticky=(tk.W, tk.E))
  
         # Quit button
-        self.closeButton = ttk.Button(self.frame, text="Close", command=self._quit)
+        self.closeButton = tkinter.ttk.Button(self.frame, text="Close", command=self._quit)
         self.closeButton.grid(row=40, column=3, padx=1, sticky=(tk.W, tk.E), pady=(10,1))            
  
         # Run button
-        self.runButton = ttk.Button(self.frame, text="Calculate All", command=self.run)
+        self.runButton = tkinter.ttk.Button(self.frame, text="Calculate All", command=self.run)
         self.runButton.grid(row=40, column=1, padx=1, sticky=(tk.E), pady=(10,1))
         
         self.runButton.config(width = 20)
 
         
         # Results button
-        self.resultsbutton = ttk.Button(self.frame, text="Plot Results", command = lambda: self.make_plot_win(self.filebox.curselection()), state='disabled')
+        self.resultsbutton = tkinter.ttk.Button(self.frame, text="Plot Results", command = lambda: self.make_plot_win(self.filebox.curselection()), state='disabled')
         self.resultsbutton.grid(row=2, column = 3, sticky=(tk.NE,tk.NW), padx=3)
         
         # Summary button
-        self.sumbutton = ttk.Button(self.frame, text="Results Summary", command = self.make_sum_win, state='disabled')
+        self.sumbutton = tkinter.ttk.Button(self.frame, text="Results Summary", command = self.make_sum_win, state='disabled')
         self.sumbutton.grid(row=3, column = 3, sticky=(tk.NE,tk.NW), padx=3)
 
     def init_menu(self):
@@ -222,7 +222,7 @@ class MainWindow:
         if os.path.isfile(README):
             webbrowser.open(README)
         else:
-            tkMessageBox.showerror("Error", "Cannot find README location")
+            tkinter.messagebox.showerror("Error", "Cannot find README location")
             
     def viewhelp(self):
         """ Open help file in default viewer """
@@ -234,7 +234,7 @@ class MainWindow:
         if os.path.isfile(PDFhelp):
             webbrowser.open(PDFhelp)
         else:
-            tkMessageBox.showerror("Error", "Cannot find help file location")
+            tkinter.messagebox.showerror("Error", "Cannot find help file location")
             
     def viewinternethelp(self):
         """ Open online documentation in default webbrowser"""
@@ -248,7 +248,7 @@ class MainWindow:
         options['filetypes'] = [('all files', '.*'), ('CIF files', '.cif')]
         options['title'] = 'CIF files for processing'
         options['defaultextension'] = '.cif'
-        filenames = tkFileDialog.askopenfilenames(parent=self.parent, **options)
+        filenames = tkinter.filedialog.askopenfilenames(parent=self.parent, **options)
         
         filelist = self.parent.tk.splitlist(filenames)
         
@@ -344,12 +344,12 @@ class MainWindow:
     def run(self):
         """ Run pieface calculation using multiCIF (through a parallel thread)."""
         if len(self.filenames) == 0:
-            tkMessageBox.showerror('Error','No files have been selected.')
+            tkinter.messagebox.showerror('Error','No files have been selected.')
             return
         
         if len(self.filebox.curselection()) > 0:
             # Some files are currently selected: check whether to use them or all files
-            if tkMessageBox.askyesno("File Selection", "Only calculate for selected files?"):
+            if tkinter.messagebox.askyesno("File Selection", "Only calculate for selected files?"):
                 procfiles = [self.filenames[i] for i in self.filebox.curselection()]
             else:
                 procfiles = self.filenames
@@ -358,7 +358,7 @@ class MainWindow:
         
         for file in procfiles:
             if not os.path.isfile(file):
-                tkMessageBox.showerror('Error', 'File {0} is not a valid file'.format(file))
+                tkinter.messagebox.showerror('Error', 'File {0} is not a valid file'.format(file))
                 return
                 
         # Check if any advanced options are passed
@@ -389,7 +389,7 @@ class MainWindow:
             
             
             # Run calculation in a new thread
-            self.resQ = Queue.Queue()
+            self.resQ = queue.Queue()
             self.calcthread = threading.Thread(target=multiCIF_thread_wrapper,
                                           args = (self.resQ,
                                                   self.parent,
@@ -431,7 +431,7 @@ class MainWindow:
                           
         #  prog = self.start_progress(self.frame)
         #    prog.start()
-        except Exception, e:
+        except Exception as e:
             #exc_type, exc_value, exc_traceback = sys.exc_info()
             #self.report_callback_exception(exc_type, exc_value, exc_traceback)
             raise
@@ -441,26 +441,26 @@ class MainWindow:
     def make_plot_win(self, selected):
         """ Create Toplevel window with selected data plotted """
         if len(selected) == 0:
-            tkMessageBox.showerror('Error','Please select files to plot results.')
+            tkinter.messagebox.showerror('Error','Please select files to plot results.')
             return
         for selection in selected:
             if self.filenames[selection] not in self.phases:
-                tkMessageBox.showerror('Error','No results exist for {0}'.format(self.filebox.get(selection)))
+                tkinter.messagebox.showerror('Error','No results exist for {0}'.format(self.filebox.get(selection)))
                 continue
             if len( self.phases[self.filenames[selection]].polyhedra ) == 0:
-                tkMessageBox.showerror('Error','No valid polyhedra exist for {0}'.format(self.filebox.get(selection)))
+                tkinter.messagebox.showerror('Error','No valid polyhedra exist for {0}'.format(self.filebox.get(selection)))
             
             crystob = self.phases[self.filenames[selection]]
             
             self.plotwin = tk.Toplevel()
             self.plotwin.iconbitmap(iconloc)
             self.plotwin.title("PIEFACE Ellipsoid Plots")
-            self.plotnb = ttk.Notebook(self.plotwin)
+            self.plotnb = tkinter.ttk.Notebook(self.plotwin)
             
             tabs = {}
             figs = {}
             for poly in sorted(crystob.polyhedra):    #Iterate through all polyhedra in Crystal object
-                tabs[poly] = ttk.Frame(self.plotnb)
+                tabs[poly] = tkinter.ttk.Frame(self.plotnb)
                 self.plotnb.add(tabs[poly], text=poly, sticky='nesw')
 
                 figs[poly] = PlotWindow(tabs[poly])
@@ -486,11 +486,11 @@ class ProgressWindow(tk.Toplevel):
         self.iconbitmap(iconloc)
         self.title('Busy')
         self.resizable(False, False)
-        self.message = ttk.Label(self, text='Please wait. This may take a long time.')
+        self.message = tkinter.ttk.Label(self, text='Please wait. This may take a long time.')
         self.message.grid(column = 0, row=0, sticky = tk.N, padx=5, pady=5)
-        self.prog = ttk.Progressbar(self, mode = 'indeterminate', orient=tk.HORIZONTAL, maximum=30)
+        self.prog = tkinter.ttk.Progressbar(self, mode = 'indeterminate', orient=tk.HORIZONTAL, maximum=30)
         self.prog.grid(column=0, row=1, sticky=(tk.E, tk.W), padx=5, pady=5)
-        tip = ttk.Label(self, text='[Tip: Perhaps a good time for a coffee?]')
+        tip = tkinter.ttk.Label(self, text='[Tip: Perhaps a good time for a coffee?]')
         tip.grid(column=0, row=2, sticky=tk.S, padx=5, pady=5)
         #self.cancel = ttk.Button(self, text='Cancel', command=self.cancel)
         #self.cancel.grid(column=0, row=2, pady=5)
@@ -539,7 +539,7 @@ class SummaryWindow(tk.Frame):
             self.init_menu()
             
             tk.Frame.__init__(self, self.parent)
-            self.nb = ttk.Notebook(self)
+            self.nb = tkinter.ttk.Notebook(self)
             
             self.columnconfigure(0, weight=1)
             self.rowconfigure(0, weight=1)
@@ -551,14 +551,14 @@ class SummaryWindow(tk.Frame):
             
             if len(phases) == 1:
                 # One phase; only plot `all` tab
-                self.tabs['all'] = ttk.Frame(self.nb)
+                self.tabs['all'] = tkinter.ttk.Frame(self.nb)
                 self.nb.add(self.tabs['all'], text='All data', sticky='nesw')
                 self.tabs['all'].columnconfigure(0, weight=1)
                 self.tabs['all'].rowconfigure(0, weight=1)
             
                 self.tables['all'] = tk.Text(self.tabs['all'], wrap='none', width=150)
-                vscrolls['all'] = ttk.Scrollbar(self.tabs['all'], orient=tk.VERTICAL)
-                hscrolls['all'] = ttk.Scrollbar(self.tabs['all'], orient=tk.HORIZONTAL)
+                vscrolls['all'] = tkinter.ttk.Scrollbar(self.tabs['all'], orient=tk.VERTICAL)
+                hscrolls['all'] = tkinter.ttk.Scrollbar(self.tabs['all'], orient=tk.HORIZONTAL)
                 self.tables['all'].config(xscrollcommand = hscrolls['all'].set)
                 self.tables['all'].config(yscrollcommand = vscrolls['all'].set)
                 vscrolls['all'].config(command = self.tables['all'].yview)
@@ -573,14 +573,14 @@ class SummaryWindow(tk.Frame):
             
                 self.tables['all'].insert(tk.END, self.sframe[selection].to_string())
             else:
-                self.tabs['all'] = ttk.Frame(self.nb)
+                self.tabs['all'] = tkinter.ttk.Frame(self.nb)
                 self.nb.add(self.tabs['all'], text='All data', sticky='nesw')
                 self.tabs['all'].columnconfigure(0, weight=1)
                 self.tabs['all'].rowconfigure(0, weight=1)
             
                 self.tables['all'] = tk.Text(self.tabs['all'], wrap='none', width=150)
-                vscrolls['all'] = ttk.Scrollbar(self.tabs['all'], orient=tk.VERTICAL)
-                hscrolls['all'] = ttk.Scrollbar(self.tabs['all'], orient=tk.HORIZONTAL)
+                vscrolls['all'] = tkinter.ttk.Scrollbar(self.tabs['all'], orient=tk.VERTICAL)
+                hscrolls['all'] = tkinter.ttk.Scrollbar(self.tabs['all'], orient=tk.HORIZONTAL)
                 self.tables['all'].config(xscrollcommand = hscrolls['all'].set)
                 self.tables['all'].config(yscrollcommand = vscrolls['all'].set)
                 vscrolls['all'].config(command = self.tables['all'].yview)
@@ -597,14 +597,14 @@ class SummaryWindow(tk.Frame):
                 self.tables['all'].insert(tk.END, self.sframe[selection].to_string())
                 
                 for site in sorted(list(set(self.dframe.columns.get_level_values(level=0)))):
-                    self.tabs[site] = ttk.Frame(self.nb)
+                    self.tabs[site] = tkinter.ttk.Frame(self.nb)
                     self.nb.add(self.tabs[site], text=site, sticky='nesw')
                     self.tabs[site].columnconfigure(0, weight=1)
                     self.tabs[site].rowconfigure(0, weight=1)
                 
                     self.tables[site] = tk.Text(self.tabs[site], wrap='none', width=150)
-                    vscrolls[site] = ttk.Scrollbar(self.tabs[site], orient=tk.VERTICAL)
-                    hscrolls[site] = ttk.Scrollbar(self.tabs[site], orient=tk.HORIZONTAL)
+                    vscrolls[site] = tkinter.ttk.Scrollbar(self.tabs[site], orient=tk.VERTICAL)
+                    hscrolls[site] = tkinter.ttk.Scrollbar(self.tabs[site], orient=tk.HORIZONTAL)
                     self.tables[site].config(xscrollcommand = hscrolls[site].set)
                     self.tables[site].config(yscrollcommand = vscrolls[site].set)
                     vscrolls[site].config(command = self.tables[site].yview)
@@ -653,7 +653,7 @@ class SummaryWindow(tk.Frame):
         options['defaultextension'] = '.csv'
         options['parent'] = self.parent
         
-        f = tkFileDialog.asksaveasfilename(**options)
+        f = tkinter.filedialog.asksaveasfilename(**options)
         if f is None or len(f) == 0:
             return
         
@@ -668,7 +668,7 @@ class SummaryWindow(tk.Frame):
         elif ext == '.html':
             self.sframe.to_html(f)
         else:
-            tkMessageBox.showerror("Unknown file type", "Unknown file type *{0}".format(ext))
+            tkinter.messagebox.showerror("Unknown file type", "Unknown file type *{0}".format(ext))
         
         
         
@@ -678,8 +678,8 @@ class LogDisplay(tk.Frame):
         self.parent = parent
         tk.Frame.__init__(self, self.parent)
         
-        self.vscroll = ttk.Scrollbar(self, orient=tk.VERTICAL)
-        self.hscroll = ttk.Scrollbar(self, orient=tk.HORIZONTAL)
+        self.vscroll = tkinter.ttk.Scrollbar(self, orient=tk.VERTICAL)
+        self.hscroll = tkinter.ttk.Scrollbar(self, orient=tk.HORIZONTAL)
         self.console = tk.Text(self, wrap='none', width=60)
         
         self.console.config(yscrollcommand = self.vscroll.set)
@@ -722,13 +722,13 @@ def raise_message(log):
     if "Label(s) %s are not present" in log.msg:
         box = tk.Toplevel(root)
         box.title('Error')
-        message = ttk.Label(box, text = log.msg % log.args)
+        message = tkinter.ttk.Label(box, text = log.msg % log.args)
         labels = {}
         for f in app.filenames:
             labels[os.path.basename(f)] = " ".join(sorted(multiCIF._alllabels(f)))
-        advice = ttk.Label(box, text = "Valid labels are:\n{0}".format( "".join( ["{0:40s}: {1:30s}\n".format(p, labels[p]) for p in labels] )))
-        tip = ttk.Label(box, text="[ Tip: Regular expressions can also be used to centre labels ]")
-        button = ttk.Button(box, text='OK', command= lambda: box.destroy())
+        advice = tkinter.ttk.Label(box, text = "Valid labels are:\n{0}".format( "".join( ["{0:40s}: {1:30s}\n".format(p, labels[p]) for p in labels] )))
+        tip = tkinter.ttk.Label(box, text="[ Tip: Regular expressions can also be used to centre labels ]")
+        button = tkinter.ttk.Button(box, text='OK', command= lambda: box.destroy())
         message.grid(row = 0, padx = 5, pady = 5)
         advice.grid(row = 1, padx = 5, pady = 5)
         tip.grid(row=2, padx=5, pady=5)
@@ -771,7 +771,7 @@ def multiCIF_thread_wrapper(*args, **kwargs):
         results = multiCIF.main(*args[2:], **kwargs)
         queue.put(results)
     except ValueError as e:
-        root_win.after(5, tkMessageBox.showerror, "Error", " ".join(e.args))
+        root_win.after(5, tkinter.messagebox.showerror, "Error", " ".join(e.args))
         queue.put_nowait(None)
 
 def main():

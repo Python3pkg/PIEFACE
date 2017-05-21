@@ -1,6 +1,6 @@
 """ Module to write pieface ellipsoid parameters to text file. """
 
-from __future__ import division
+
 import os, sys
 import numpy as np
 import textwrap
@@ -144,7 +144,7 @@ def _query(question, default="yes"):
         #print question + prompt
         logger.critical(question + prompt)
         sleep(1)    # Sleep briefly to allow logger to output last message
-        choice = raw_input().lower()
+        choice = input().lower()
         if default is not None and choice == '':
             return valid[default]
         elif choice in valid:
@@ -166,7 +166,7 @@ def writeall(FILE, phase, verbosity=3, overwrite=False):
                     logger.critical("Enter new filename ([Return] to exit):\t")
                     sleep(1)    # Sleep briefly to allow logger to output last message
                     #newout = raw_input("Enter new filename ([Return] to exit):\t")
-                    newout = raw_input()
+                    newout = input()
                     if newout == "":
                         return
                     else:
